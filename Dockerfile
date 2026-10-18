@@ -1,5 +1,4 @@
-# Force rebuild cache
-FROM php:8.2-apache
+FROM php:8.2-cli
 
 # Install system dependencies & PHP extensions
 RUN apt-get update && apt-get install -y \
@@ -32,20 +31,8 @@ RUN composer install --no-dev --optimize-autoloader
 # Set permissions for Laravel storage and bootstrap cache
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Configure Apache Document Root to point to Laravel's public folder
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-RUN sed -ri -s 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -s 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+# Expose port (Railway menggunakan port 8080 secara default untuk server non-apache)
+EXPOSE 8080
 
-# Disable event and worker, ensure only prefork is active for PHP Apache
-RUN a2dismod mpm_event mpm_worker || true
-RUN a2enmod mpm_prefork
-
-# Enable Apache Mod Rewrite
-RUN a2enmod rewrite
-
-# Expose port 80
-EXPOSE 80
-
-# Run Apache foreground
-CMD apache2-foreground
+# Run Laravel built-in server
+CMD php artisan serve --host=0.0.0.0 --port=8080
