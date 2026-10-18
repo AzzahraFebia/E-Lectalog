@@ -25,7 +25,7 @@ WORKDIR /var/www/html
 # Copy existing application directory contents
 COPY . /var/www/html
 
-# INSTALL COMPOSER DEPENDENCIES (PENTING AGAR VENDOR TERBUAT)
+# Install Composer dependencies
 RUN composer install --no-dev --optimize-autoloader
 
 # Set permissions for Laravel storage and bootstrap cache
@@ -35,6 +35,10 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -s 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -s 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+# Fix MPM Conflict: Disable worker/prefork and enable mpm_event cleanly
+RUN a2dismod mpm_prefork mpm_worker || true
+RUN a2enmod mpm_event
 
 # Enable Apache Mod Rewrite
 RUN a2enmod rewrite
