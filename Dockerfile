@@ -1,3 +1,4 @@
+# Force rebuild cache
 FROM php:8.2-apache
 
 # Install system dependencies & PHP extensions
