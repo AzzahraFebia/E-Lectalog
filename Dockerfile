@@ -25,6 +25,9 @@ WORKDIR /var/www/html
 # Copy existing application directory contents
 COPY . /var/www/html
 
+# INSTALL COMPOSER DEPENDENCIES (PENTING AGAR VENDOR TERBUAT)
+RUN composer install --no-dev --optimize-autoloader
+
 # Set permissions for Laravel storage and bootstrap cache
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
@@ -39,5 +42,5 @@ RUN a2enmod rewrite
 # Expose port 80
 EXPOSE 80
 
-# Run Composer install and start Apache
-CMD php artisan config:cache && apache2-foreground
+# Run Apache foreground
+CMD apache2-foreground
