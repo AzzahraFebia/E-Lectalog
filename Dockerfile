@@ -37,9 +37,11 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -s 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -s 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Cleanly configure MPM Event and Mod Rewrite
+# Disable event and worker, ensure only prefork is active for PHP Apache
 RUN a2dismod mpm_event mpm_worker || true
 RUN a2enmod mpm_prefork
+
+# Enable Apache Mod Rewrite
 RUN a2enmod rewrite
 
 # Expose port 80
